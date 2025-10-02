@@ -36,6 +36,7 @@
     </div>
 
     <script>
+        'use strict'
         const num1 = document.getElementById('num1');
         const num2 = document.getElementById('num2');
         const result = document.getElementById('result');
@@ -49,65 +50,54 @@
     </script>
 
     <script> //скрипт для добавления слогаемых
-        const addTermBtn = document.getElementById('add-term');
-        const removeTermBtn = document.getElementById('remove-term');
-        const dynamicInputs = document.getElementById('dynamic-inputs');
-        let inputCount = 0;
+        'use strict'
+        const elements = {
+            addTerm: document.getElementById('add-term'),
+            removeTerm: document.getElementById('remove-term'),
+            dynamicInputs: document.getElementById('dynamic-inputs'),
+            num1: document.getElementById('num1'),
+            num2: document.getElementById('num2'),
+            result: document.getElementById('result')
+        };
 
-        function addInputField() {
-            inputCount++;
+        const updateCalculation = () => {
+            const baseSum = [elements.num1, elements.num2]
+                .reduce((sum, el) => sum + (parseInt(el.value) || 0), 0);
+
+            const dynamicSum = Array.from(elements.dynamicInputs.querySelectorAll('input'))
+                .reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+
+            elements.result.textContent = baseSum + dynamicSum;
+        };
+
+        const addInputField = () => {
             const row = document.createElement('div');
             row.className = 'dynamic-row';
-
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-btn';
-            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
-            removeBtn.onclick = function () {
-                row.remove();
-                updateCalculation();
-            };
-
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.className = 'input-field';
-            input.value = '0';
-            input.addEventListener('input', updateCalculation);
-
-            const operator = document.createElement('span');
-            operator.className = 'operator';
-            operator.textContent = '+';
-
-            row.appendChild(removeBtn);
-            row.appendChild(input);
-            row.appendChild(operator);
-
-            dynamicInputs.appendChild(row);
+            row.innerHTML = `
+        <button class="remove-btn" onclick="this.parentElement.remove(); updateCalculation()">
+            <i class="fas fa-times"></i>
+        </button>
+        <input type="number" class="input-field" value="0">
+        <span class="operator">+</span>
+    `;
+            row.querySelector('input').addEventListener('input', updateCalculation);
+            elements.dynamicInputs.appendChild(row);
             updateCalculation();
-        }
+        };
 
-        function removeInputField() {
-            if (inputCount > 0) {
-                const lastRow = dynamicInputs.lastElementChild;
-                if (lastRow) {
-                    lastRow.remove();
-                    inputCount--;
-                    updateCalculation();
-                }
-            }
-        }
+        const removeInputField = () => {
+            elements.dynamicInputs.lastElementChild?.remove();
+            updateCalculation();
+        };
 
-        function updateCalculation() {
-            let sum = parseInt(num1.value) + parseInt(num2.value);
-            const dynamicInputs = document.querySelectorAll('.dynamic-row input');
-            dynamicInputs.forEach(input => {
-                sum += parseInt(input.value);
-            });
-            result.textContent = isNaN(sum) ? 'Ошибка' : sum;
-        }
-        addTermBtn.addEventListener('click', addInputField);
-        removeTermBtn.addEventListener('click', removeInputField);
-
-        calculateSum();
+        // Инициализация
+        elements.addTerm.addEventListener('click', addInputField);
+        elements.removeTerm.addEventListener('click', removeInputField);
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateCalculation);
+        });
+        updateCalculation();
+    </script>
     </script>
 </body>
 
