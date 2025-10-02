@@ -44,9 +44,70 @@
             const sum = parseInt(num1.value) + parseInt(num2.value);
             result.textContent = isNaN(sum) ? 'Ошибка' : sum;
         }
-
         num1.addEventListener('input', calculateSum);
         num2.addEventListener('input', calculateSum);
+    </script>
+
+    <script> //скрипт для добавления слогаемых
+        const addTermBtn = document.getElementById('add-term');
+        const removeTermBtn = document.getElementById('remove-term');
+        const dynamicInputs = document.getElementById('dynamic-inputs');
+        let inputCount = 0;
+
+        function addInputField() {
+            inputCount++;
+            const row = document.createElement('div');
+            row.className = 'dynamic-row';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = function () {
+                row.remove();
+                updateCalculation();
+            };
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'input-field';
+            input.value = '0';
+            input.addEventListener('input', updateCalculation);
+
+            const operator = document.createElement('span');
+            operator.className = 'operator';
+            operator.textContent = '+';
+
+            row.appendChild(removeBtn);
+            row.appendChild(input);
+            row.appendChild(operator);
+
+            dynamicInputs.appendChild(row);
+            updateCalculation();
+        }
+
+        function removeInputField() {
+            if (inputCount > 0) {
+                const lastRow = dynamicInputs.lastElementChild;
+                if (lastRow) {
+                    lastRow.remove();
+                    inputCount--;
+                    updateCalculation();
+                }
+            }
+        }
+
+        function updateCalculation() {
+            let sum = parseInt(num1.value) + parseInt(num2.value);
+            const dynamicInputs = document.querySelectorAll('.dynamic-row input');
+            dynamicInputs.forEach(input => {
+                sum += parseInt(input.value);
+            });
+            result.textContent = isNaN(sum) ? 'Ошибка' : sum;
+        }
+        addTermBtn.addEventListener('click', addInputField);
+        removeTermBtn.addEventListener('click', removeInputField);
+
+        calculateSum();
     </script>
 </body>
 
